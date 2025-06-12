@@ -1,0 +1,17 @@
+<svg width="512" height="512" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg" data-ai-hint="cherry">
+  <title>Cute Cherries Icon</title>
+  <!-- Stems -->
+  <path d="M96 32 C80 42 70 62 70 82" stroke="#8D6E63" stroke-width="10" stroke-linecap="round"/>
+  <path d="M96 32 C112 42 122 62 122 82" stroke="#8D6E63" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Leaf -->
+  <ellipse cx="96" cy="47" rx="25" ry="12" fill="#66BB6A" transform="rotate(15 96 47)"/>
+
+  <!-- Cherry 1 -->
+  <circle cx="70" cy="110" r="40" fill="#E53935"/>
+  <circle cx="60" cy="95" r="8" fill="#FFCDD2"/> <!-- Highlight 1 -->
+
+  <!-- Cherry 2 -->
+  <circle cx="122" cy="110" r="40" fill="#E53935"/>
+  <circle cx="112" cy="95" r="8" fill="#FFCDD2"/> <!-- Highlight 2 -->
+</svg>

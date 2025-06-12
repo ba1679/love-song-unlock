@@ -1,0 +1,24 @@
+{
+  "name": "LoveUnlock - 每日歌曲解鎖",
+  "short_name": "LoveUnlock",
+  "description": "每天回答一個特別的問題來為您的摯愛解鎖一首歌曲。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAE6E8",
+  "theme_color": "#FFC0CB",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
