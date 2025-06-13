@@ -7,6 +7,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getTodayDateString(): string {
+  // for demo
+  return '20250801';
   const today = new Date();
   const year = today.getFullYear();
   const month = (today.getMonth() + 1).toString().padStart(2, '0');
