@@ -11,14 +11,15 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: 'LoveUnlock - Daily Song Puzzles',
-  description: 'Answer daily questions to unlock a special song for your loved one!',
+  title: 'The song, Our story - Daily Song Puzzles',
+  description:
+    'Answer daily questions to unlock a special song for your loved one!',
   manifest: '/manifest.json', // Link to the Web App Manifest
-  applicationName: 'LoveUnlock',
+  applicationName: 'The song, Our story',
   appleWebApp: {
     capable: true, // Enables PWA features on iOS
     statusBarStyle: 'default', // Can be 'black', 'black-translucent'
-    title: 'LoveUnlock', // Title shown when added to home screen
+    title: 'The song, Our story', // Title shown when added to home screen
   },
   formatDetection: {
     telephone: false,
