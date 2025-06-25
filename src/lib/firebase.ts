@@ -1,4 +1,5 @@
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
+import { getAnalytics, type Analytics } from 'firebase/analytics';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,12 +12,20 @@ const firebaseConfig = {
 };
 
 let app: FirebaseApp;
+let analytics: Analytics | undefined;
 
 if (typeof window !== 'undefined') { // Ensure Firebase is initialized only on the client-side
   if (getApps().length === 0) {
     app = initializeApp(firebaseConfig);
   } else {
     app = getApps()[0];
+  }
+  
+  // Initialize Analytics only on client-side
+  try {
+    analytics = getAnalytics(app);
+  } catch (error) {
+    console.warn('Analytics initialization failed:', error);
   }
 } else {
   // Mock app for server-side if needed, or handle differently
@@ -25,6 +34,5 @@ if (typeof window !== 'undefined') { // Ensure Firebase is initialized only on t
   // However, firestoreService will be used by client components.
 }
 
-
 // @ts-ignore
-export { app };
+export { app, analytics };
