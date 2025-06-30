@@ -37,7 +37,13 @@ export default function DailyChallengeView() {
       if (fetchedChallenge) {
         setChallenge(fetchedChallenge);
       } else {
-        setError("今天沒有挑戰了，我們直接見面吧😚");
+        const today = new Date();
+        const startDate = new Date("2025-07-01");
+        if(today < startDate) {
+          setError("挑戰還沒開始！明天再來😙");
+        }else {
+          setError("今天沒有挑戰了，我們直接見面吧💖");
+        }
       }
     } catch (err) {
       console.error("Failed to load challenge:", err);
