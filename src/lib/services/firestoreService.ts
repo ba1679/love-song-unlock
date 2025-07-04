@@ -1,4 +1,4 @@
-import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, collection, getDocs, query } from 'firebase/firestore';
 import { app } from '@/lib/firebase'; // Firebase app instance
 import type { DailyChallenge } from '@/lib/types';
 
@@ -46,7 +46,7 @@ export async function getAllChallenges(): Promise<DailyChallenge[]> {
   }
   const challengesCollectionRef = collection(db, 'dailyChallenges');
   // Order by document ID (which is the date string 'YYYYMMDD') in descending order to get latest first
-  const q = query(challengesCollectionRef, orderBy('__name__', 'desc'));
+  const q = query(challengesCollectionRef);
 
   try {
     const querySnapshot = await getDocs(q);
