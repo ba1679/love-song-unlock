@@ -1,4 +1,5 @@
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
+import { getAuth, type Auth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,6 +11,7 @@ const firebaseConfig = {
 };
 
 let app: FirebaseApp;
+let auth: Auth;
 
 if (typeof window !== 'undefined') { // Ensure Firebase is initialized only on the client-side
   if (getApps().length === 0) {
@@ -17,6 +19,7 @@ if (typeof window !== 'undefined') { // Ensure Firebase is initialized only on t
   } else {
     app = getApps()[0];
   }
+  auth = getAuth(app);
 } else {
   // Mock app for server-side if needed, or handle differently
   // For this app, Firestore interaction is client-side mostly
@@ -26,4 +29,4 @@ if (typeof window !== 'undefined') { // Ensure Firebase is initialized only on t
 
 
 // @ts-ignore
-export { app };
+export { app, auth };

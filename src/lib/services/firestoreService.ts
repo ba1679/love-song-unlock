@@ -1,4 +1,4 @@
-import { getFirestore, doc, getDoc, collection } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { app } from '@/lib/firebase'; // Firebase app instance
 import type { DailyChallenge } from '@/lib/types';
 
@@ -33,5 +33,30 @@ export async function getDailyChallenge(dateStr: string): Promise<DailyChallenge
     console.error("Error fetching daily challenge from Firestore:", error);
     // Consider throwing a custom error or returning a specific error object
     return null;
+  }
+}
+
+export async function getAllChallenges(): Promise<DailyChallenge[]> {
+  if (!db) {
+    if (typeof window !== 'undefined' && app) {
+        db = getFirestore(app);
+    } else {
+        return [];
+    }
+  }
+  const challengesCollectionRef = collection(db, 'dailyChallenges');
+  // Order by document ID (which is the date string 'YYYYMMDD') in descending order to get latest first
+  const q = query(challengesCollectionRef, orderBy('__name__', 'desc'));
+
+  try {
+    const querySnapshot = await getDocs(q);
+    const challenges: DailyChallenge[] = [];
+    querySnapshot.forEach((doc) => {
+      challenges.push({ id: doc.id, ...doc.data() } as DailyChallenge);
+    });
+    return challenges;
+  } catch (error) {
+    console.error("Error fetching all challenges from Firestore:", error);
+    return [];
   }
 }
