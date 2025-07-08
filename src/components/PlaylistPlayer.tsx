@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState, useRef, useEffect, type ReactNode } from 'react';
+import { useState, useRef, useEffect, type ReactNode, useCallback } from 'react';
 import type { DailyChallenge } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -21,15 +22,53 @@ export function PlaylistPlayer({ songs, title, description, headerActions, empty
 
   const currentSong = songs[currentIndex];
 
-  const playNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % songs.length);
-  };
+  const playNext = useCallback(() => {
+    if (songs.length > 1) {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % songs.length);
+    }
+  }, [songs.length]);
+
+  const playPrevious = useCallback(() => {
+    if (songs.length > 1) {
+      setCurrentIndex((prevIndex) => (prevIndex - 1 + songs.length) % songs.length);
+    }
+  }, [songs.length]);
   
   useEffect(() => {
     if (audioRef.current) {
         audioRef.current.play().catch(e => console.error("Autoplay was prevented:", e));
     }
   }, [currentIndex]);
+  
+  useEffect(() => {
+    if (!currentSong) return;
+
+    if (typeof window !== 'undefined' && 'mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: currentSong.songTitle,
+        artist: 'LoveUnlock', // You can change this or make it dynamic
+        album: 'Unlocked Songs',
+      });
+
+      const audio = audioRef.current;
+      navigator.mediaSession.setActionHandler('play', () => audio?.play());
+      navigator.mediaSession.setActionHandler('pause', () => audio?.pause());
+      navigator.mediaSession.setActionHandler('previoustrack', playPrevious);
+      navigator.mediaSession.setActionHandler('nexttrack', playNext);
+    }
+    
+    // Cleanup on component unmount or song change
+    return () => {
+        if (typeof window !== 'undefined' && 'mediaSession' in navigator) {
+            navigator.mediaSession.metadata = null;
+            navigator.mediaSession.setActionHandler('play', null);
+            navigator.mediaSession.setActionHandler('pause', null);
+            navigator.mediaSession.setActionHandler('previoustrack', null);
+            navigator.mediaSession.setActionHandler('nexttrack', null);
+        }
+    }
+
+  }, [currentSong, playNext, playPrevious]);
 
   // Reset index if songs array changes to avoid out-of-bounds error
   useEffect(() => {
