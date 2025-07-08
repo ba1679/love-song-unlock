@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -9,19 +9,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { KeyRound, LogIn } from 'lucide-react';
+import { KeyRound, LogIn, Loader2 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { user, isLoading: isAuthLoading } = useAuth();
+
+  useEffect(() => {
+    // If auth state is determined and user is logged in, redirect.
+    if (!isAuthLoading && user) {
+      router.replace('/admin/playlist');
+    }
+  }, [user, isAuthLoading, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsSubmitting(true);
     setError(null);
 
     try {
@@ -46,9 +55,18 @@ export default function LoginPage() {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
+
+  // While checking auth state or if user exists (and redirect is in progress), show a loader.
+  if (isAuthLoading || user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
@@ -69,7 +87,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
+                disabled={isSubmitting}
               />
             </div>
             <div className="space-y-2">
@@ -81,12 +99,12 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
+                disabled={isSubmitting}
               />
             </div>
             {error && <p className="text-sm text-destructive text-center pt-2">{error}</p>}
-            <Button type="submit" className="w-full mt-2" disabled={isLoading}>
-              {isLoading ? 'Logging in...' : 'Log In'}
+            <Button type="submit" className="w-full mt-2" disabled={isSubmitting}>
+              {isSubmitting ? 'Logging in...' : 'Log In'}
               <LogIn className="ml-2 h-4 w-4" />
             </Button>
           </form>
