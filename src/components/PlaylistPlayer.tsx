@@ -1,24 +1,23 @@
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type ReactNode } from 'react';
 import type { DailyChallenge } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Music, ListMusic, LogOut } from 'lucide-react';
+import { Music, ListMusic, Inbox } from 'lucide-react';
 import { cn, formatDisplayDate } from '@/lib/utils';
-import { signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
-import { useRouter } from 'next/navigation';
 
 interface PlaylistPlayerProps {
   songs: DailyChallenge[];
+  title: string;
+  description?: string;
+  headerActions?: ReactNode;
+  emptyState?: ReactNode;
 }
 
-export function PlaylistPlayer({ songs }: PlaylistPlayerProps) {
+export function PlaylistPlayer({ songs, title, description, headerActions, emptyState }: PlaylistPlayerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const router = useRouter();
 
   const currentSong = songs[currentIndex];
 
@@ -26,32 +25,35 @@ export function PlaylistPlayer({ songs }: PlaylistPlayerProps) {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % songs.length);
   };
   
-  // Effect to auto-play when song changes via the list
   useEffect(() => {
     if (audioRef.current) {
         audioRef.current.play().catch(e => console.error("Autoplay was prevented:", e));
     }
   }, [currentIndex]);
 
+  // Reset index if songs array changes to avoid out-of-bounds error
+  useEffect(() => {
+    setCurrentIndex(0);
+  }, [songs]);
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    router.push('/admin/login');
-  };
-
-  if (!currentSong) {
+  if (songs.length === 0) {
     return (
-        <Card className="w-full max-w-lg mx-auto h-full flex flex-col justify-center items-center">
-            <CardHeader>
-                <CardTitle>No Songs Available</CardTitle>
+        <Card className="w-full max-w-2xl mx-auto h-full flex flex-col">
+            <CardHeader className="flex-shrink-0 flex flex-row justify-between items-center p-4">
+                <div>
+                    <CardTitle className="text-2xl font-bold text-primary-foreground">{title}</CardTitle>
+                    {description && <CardDescription className="text-sm text-muted-foreground">{description}</CardDescription>}
+                </div>
+                {headerActions}
             </CardHeader>
-            <CardContent>
-                <p>There are no songs in the playlist.</p>
+            <CardContent className="h-full flex flex-col justify-center items-center">
+                {emptyState || (
+                    <div className="text-center py-8 flex flex-col justify-center items-center h-full">
+                        <Inbox className="mx-auto h-16 w-16 text-muted-foreground mb-3" />
+                        <p className="text-muted-foreground text-lg">No songs in the playlist.</p>
+                    </div>
+                )}
             </CardContent>
-             <Button variant="outline" onClick={handleLogout} className="m-4">
-                <LogOut className="mr-2 h-4 w-4" />
-                Log Out
-            </Button>
         </Card>
     );
   }
@@ -60,13 +62,10 @@ export function PlaylistPlayer({ songs }: PlaylistPlayerProps) {
     <Card className="w-full max-w-2xl mx-auto flex flex-col shadow-xl border-primary h-full">
       <CardHeader className="flex-shrink-0 flex flex-row justify-between items-center p-4">
         <div>
-            <CardTitle className="text-2xl font-bold text-primary-foreground">Song Playlist</CardTitle>
-            <p className="text-sm text-muted-foreground">Admin View</p>
+            <CardTitle className="text-2xl font-bold text-primary-foreground">{title}</CardTitle>
+            {description && <CardDescription className="text-sm text-muted-foreground">{description}</CardDescription>}
         </div>
-        <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Log Out
-        </Button>
+        {headerActions}
       </CardHeader>
       <CardContent className="flex-grow flex flex-col gap-4 p-4 pt-0 overflow-hidden">
         {/* Player */}

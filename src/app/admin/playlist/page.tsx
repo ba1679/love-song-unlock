@@ -6,7 +6,10 @@ import { useAuth } from '@/context/AuthContext';
 import { getAllChallenges } from '@/lib/services/firestoreService';
 import type { DailyChallenge } from '@/lib/types';
 import { PlaylistPlayer } from '@/components/PlaylistPlayer';
-import { Loader2 } from 'lucide-react';
+import { Loader2, LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export default function PlaylistPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -22,13 +25,20 @@ export default function PlaylistPage() {
         const fetchSongs = async () => {
           setIsDataLoading(true);
           const allSongs = await getAllChallenges();
-          setSongs(allSongs);
+           // Sort songs by date descending
+          const sortedSongs = allSongs.sort((a, b) => b.id.localeCompare(a.id));
+          setSongs(sortedSongs);
           setIsDataLoading(false);
         };
         fetchSongs();
       }
     }
   }, [user, isAuthLoading, router]);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push('/admin/login');
+  };
 
   if (isAuthLoading || (user && isDataLoading)) {
     return (
@@ -45,10 +55,22 @@ export default function PlaylistPage() {
   if (!user) {
     return null; 
   }
+  
+  const adminHeaderActions = (
+    <Button variant="outline" onClick={handleLogout}>
+        <LogOut className="mr-2 h-4 w-4" />
+        Log Out
+    </Button>
+  );
 
   return (
     <div className="h-screen w-full p-2 sm:p-4 bg-gradient-to-br from-background to-pink-100">
-      <PlaylistPlayer songs={songs} />
+      <PlaylistPlayer 
+        songs={songs} 
+        title="Song Playlist"
+        description="Admin View"
+        headerActions={adminHeaderActions}
+      />
     </div>
   );
 }

@@ -1,11 +1,11 @@
 import DailyChallengeView from "@/components/DailyChallengeView";
 import { Button } from "@/components/ui/button";
-import { Heart, ListMusic } from "lucide-react";
+import { Heart, ListMusic, PlayCircle } from "lucide-react";
 import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <div className="container mx-auto px-4 py-2 sm:py-4 flex flex-col items-center justify-around h-full bg-gradient-to-br from-background to-pink-100 dark:from-background dark:to-purple-900">
+    <div className="container mx-auto px-4 py-2 sm:py-4 flex flex-col items-center justify-between h-full bg-gradient-to-br from-background to-pink-100 dark:from-background dark:to-purple-900">
       <header className="mt-2 sm:mt-0 mb-1 sm:mb-2 text-center">
         <h1 className="text-4xl sm:text-5xl font-bold text-primary-foreground flex items-center justify-center">
           <Heart className="w-8 h-8 sm:w-12 sm:h-12 mr-1 sm:mr-3 text-primary fill-primary/30" />
@@ -18,12 +18,20 @@ export default function HomePage() {
         <DailyChallengeView />
       </div>
       <div className="flex flex-col items-center gap-4 mb-1 sm:mb-0 mt-1 sm:mt-2">
-        <Button asChild variant="outline" className="bg-accent/30 hover:bg-accent/50 border-accent text-accent-foreground">
-          <Link href="/unlocked">
-            <ListMusic className="mr-2 h-5 w-5" />
-            已解鎖的歌曲
-          </Link>
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-4">
+            <Button asChild variant="outline" className="bg-accent/30 hover:bg-accent/50 border-accent text-accent-foreground">
+              <Link href="/unlocked">
+                <ListMusic className="mr-2 h-5 w-5" />
+                已解鎖的歌曲
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="bg-accent/30 hover:bg-accent/50 border-accent text-accent-foreground">
+              <Link href="/unlocked/playlist">
+                <PlayCircle className="mr-2 h-5 w-5" />
+                播放已解鎖清單
+              </Link>
+            </Button>
+        </div>
         <Link href="/admin/login" className="text-xs text-muted-foreground hover:underline">
           Admin Login
         </Link>
