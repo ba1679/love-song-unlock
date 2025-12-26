@@ -9,7 +9,7 @@ import { PlaylistPlayer } from '@/components/PlaylistPlayer';
 import { Loader2, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { getAuth } from '@/lib/firebase';
 
 export default function PlaylistPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -44,9 +44,8 @@ export default function PlaylistPage() {
 
   const handleLogout = async () => {
     try {
-      if (auth) {
-        await signOut(auth);
-      }
+      const auth = getAuth();
+      await signOut(auth);
       router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);

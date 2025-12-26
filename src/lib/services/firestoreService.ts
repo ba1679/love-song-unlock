@@ -1,24 +1,38 @@
-import { getFirestore, doc, getDoc, collection, getDocs, query } from 'firebase/firestore';
-import { app } from '@/lib/firebase'; // Firebase app instance
+import { getFirestore, doc, getDoc, collection, getDocs, query, type Firestore } from 'firebase/firestore';
+import { getApp } from '@/lib/firebase'; // Firebase app instance
 import type { DailyChallenge } from '@/lib/types';
 
-let db: any; // Delay initialization until app is available
-if (app) {
-  db = getFirestore(app);
-}
+let db: Firestore | undefined; // Lazy initialization
 
+/**
+ * Get Firestore instance (lazy initialization)
+ * Only initializes on the client side when first called
+ */
+function getDb(): Firestore | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
 
-export async function getDailyChallenge(dateStr: string): Promise<DailyChallenge | null> {
   if (!db) {
-    console.warn("Firestore not initialized. App might be running on server or Firebase config missing.");
-    // Attempt to initialize if called on client and not yet done (e.g. due to conditional app init)
-    if (typeof window !== 'undefined' && app) {
-        db = getFirestore(app);
-    } else {
-        return null;
+    try {
+      const app = getApp();
+      db = getFirestore(app);
+    } catch (error) {
+      console.error('Failed to initialize Firestore:', error);
+      return null;
     }
   }
-  const challengesCollectionRef = collection(db, 'dailyChallenges');
+
+  return db;
+}
+
+export async function getDailyChallenge(dateStr: string): Promise<DailyChallenge | null> {
+  const firestore = getDb();
+  if (!firestore) {
+    console.warn("Firestore not initialized. This function can only be called on the client side.");
+    return null;
+  }
+  const challengesCollectionRef = collection(firestore, 'dailyChallenges');
   try {
     const docRef = doc(challengesCollectionRef, dateStr);
     const docSnap = await getDoc(docRef);
@@ -37,14 +51,12 @@ export async function getDailyChallenge(dateStr: string): Promise<DailyChallenge
 }
 
 export async function getAllChallenges(): Promise<DailyChallenge[]> {
-  if (!db) {
-    if (typeof window !== 'undefined' && app) {
-        db = getFirestore(app);
-    } else {
-        return [];
-    }
+  const firestore = getDb();
+  if (!firestore) {
+    console.warn("Firestore not initialized. This function can only be called on the client side.");
+    return [];
   }
-  const challengesCollectionRef = collection(db, 'dailyChallenges');
+  const challengesCollectionRef = collection(firestore, 'dailyChallenges');
   // Order by document ID (which is the date string 'YYYYMMDD') in descending order to get latest first
   const q = query(challengesCollectionRef);
 

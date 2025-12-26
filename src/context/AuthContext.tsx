@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useMemo, type ReactNode } from 'react';
 import { onAuthStateChanged, type User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { getAuth } from '@/lib/firebase';
 
 interface AuthContextType {
   user: User | null;
@@ -16,9 +16,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // 確保 auth 已初始化
-    if (!auth) {
-      console.error('Firebase auth is not initialized');
+    // 使用 lazy initialization 獲取 auth 實例
+    let auth;
+    try {
+      auth = getAuth();
+    } catch (error) {
+      console.error('Firebase auth is not initialized:', error);
       setIsLoading(false);
       return;
     }
