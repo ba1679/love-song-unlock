@@ -18,26 +18,39 @@ export default function PlaylistPage() {
   const [isDataLoading, setIsDataLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthLoading) {
-      if (!user) {
-        router.replace('/admin/login');
-      } else {
-        const fetchSongs = async () => {
+    if (isAuthLoading) {
+      return;
+    }
+
+    if (user) {
+      const fetchSongs = async () => {
+        try {
           setIsDataLoading(true);
           const allSongs = await getAllChallenges();
-           // Sort songs by date descending
-          const sortedSongs = allSongs.sort((a, b) => b.id.localeCompare(a.id));
+          // Sort songs by date descending
+          const sortedSongs = [...allSongs].sort((a, b) => b.id.localeCompare(a.id));
           setSongs(sortedSongs);
+        } catch (error) {
+          console.error('Error fetching songs:', error);
+        } finally {
           setIsDataLoading(false);
-        };
-        fetchSongs();
-      }
+        }
+      };
+      fetchSongs();
+    } else {
+      router.replace('/');
     }
   }, [user, isAuthLoading, router]);
 
   const handleLogout = async () => {
-    await signOut(auth);
-    router.push('/admin/login');
+    try {
+      if (auth) {
+        await signOut(auth);
+      }
+      router.push('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   if (isAuthLoading || (user && isDataLoading)) {

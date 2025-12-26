@@ -10,23 +10,16 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-let app: FirebaseApp;
-let auth: Auth;
+let app: FirebaseApp | undefined;
+let auth: Auth | undefined;
 
-if (typeof window !== 'undefined') { // Ensure Firebase is initialized only on the client-side
+if (typeof globalThis.window !== 'undefined') { // Ensure Firebase is initialized only on the client-side
   if (getApps().length === 0) {
     app = initializeApp(firebaseConfig);
   } else {
     app = getApps()[0];
   }
   auth = getAuth(app);
-} else {
-  // Mock app for server-side if needed, or handle differently
-  // For this app, Firestore interaction is client-side mostly
-  // If getApps() throws on server, this check needs refinement.
-  // However, firestoreService will be used by client components.
 }
 
-
-// @ts-ignore
 export { app, auth };
